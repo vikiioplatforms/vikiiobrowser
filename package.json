@@ -8,11 +8,21 @@
     "build": "vite build",
     "build:electron": "tsc -p tsconfig.electron.json",
     "build:all": "npm run build && npm run build:electron",
-    "start": "concurrently \"vite\" \"wait-on http://localhost:5173 && NODE_ENV=development electron .\"",
+    "electron": "electron .",
+    "start": "concurrently -k \"vite\" \"wait-on tcp:5173 && cross-env NODE_ENV=development electron .\"",
     "preview": "vite preview",
-    "dist": "npm run build:all && electron-builder"
+    "dist": "npm run build:all && electron-builder",
+    "dist:mac": "npm run build:all && electron-builder --mac",
+    "dist:win": "npm run build:all && electron-builder --win",
+    "dist:linux": "npm run build:all && electron-builder --linux"
   },
-  "keywords": ["browser", "ai", "privacy", "chromium", "electron"],
+  "keywords": [
+    "browser",
+    "ai",
+    "privacy",
+    "chromium",
+    "electron"
+  ],
   "author": "Vikiio",
   "license": "MIT",
   "devDependencies": {
@@ -21,6 +31,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
     "concurrently": "^9.0.0",
+    "cross-env": "^7.0.3",
     "electron": "^33.0.0",
     "electron-builder": "^25.0.0",
     "typescript": "^5.5.0",
@@ -45,7 +56,16 @@
       "dist-electron/**/*"
     ],
     "mac": {
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ]
     },
     "win": {
       "target": "nsis"
