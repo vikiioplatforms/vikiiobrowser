@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Tab — Vikiio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #0d0f14;
+      --surface:      rgba(255,255,255,0.035);
+      --surface-hover:rgba(255,255,255,0.06);
+      --border:       rgba(255,255,255,0.09);
+      --border-focus: rgba(99,102,241,0.7);
+      --indigo:       #6366f1;
+      --indigo-dim:   rgba(99,102,241,0.15);
+      --indigo-glow:  rgba(99,102,241,0.12);
+      --text-primary: rgba(255,255,255,0.92);
+      --text-secondary:rgba(255,255,255,0.52);
+      --text-muted:   rgba(255,255,255,0.3);
+      --green:        #4ade80;
+      --red-dot:      #ef4444;
+      --transition:   150ms ease;
+      --radius-sm:    6px;
+      --radius-md:    9px;
+      --radius-lg:    12px;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      overflow: hidden;
+    }
+
+    button { cursor: pointer; background: none; border: none; color: inherit; font-family: inherit; }
+    input  { font-family: inherit; }
+    a      { text-decoration: none; color: inherit; }
+
+    /* ── Dot-grid background ──────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Indigo radial glow behind clock ─────────────────────────────────── */
+    .glow {
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse 60% 55% at 50% 30%, var(--indigo-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout wrapper ──────────────────────────────────────────────────── */
+    .page {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       1. TOP CHROME BAR
+    ════════════════════════════════════════════════════════════════════════ */
+    .chrome-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px 0;
+      flex-shrink: 0;
+    }
+
+    .chrome-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .logo-mark {
+      width: 22px;
+      height: 22px;
+      background: var(--indigo);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .logo-word {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+
+    .mode-badge {
+      padding: 3px 9px;
+      background: var(--indigo-dim);
+      border: 0.5px solid rgba(99,102,241,0.35);
+      border-radius: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 400;
+      color: rgba(99,102,241,0.9);
+      letter-spacing: 0.3px;
+    }
+
+    .chrome-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-chip {
+      padding: 3px 9px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .stat-chip.trackers { color: var(--green); }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       2. TAB BAR
+    ════════════════════════════════════════════════════════════════════════ */
+    .tab-bar {
+      display: flex;
+      align-items: flex-end;
+      padding: 8px 16px 0;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 7px 7px 0 0;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-muted);
+      background: transparent;
+      border: 0.5px solid transparent;
+      border-bottom: none;
+      transition: all var(--transition);
+      position: relative;
+      white-space: nowrap;
+    }
+    .tab:hover { color: var(--text-secondary); background: var(--surface); }
+
+    .tab.active {
+      background: var(--surface-hover);
+      border-color: var(--border);
+      border-bottom-color: var(--bg);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0; right: 0;
+      height: 1px;
+      background: var(--bg);
+    }
+
+    .tab-star  { color: var(--indigo); font-size: 10px; }
+    .tab-dot   { width: 6px; height: 6px; border-radius: 50%; background: var(--red-dot); flex-shrink: 0; }
+    .tab-close {
+      width: 14px; height: 14px;
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      opacity: 0;
+      transition: opacity var(--transition), background var(--transition);
+    }
+    .tab:hover .tab-close { opacity: 1; }
+    .tab-close:hover { background: rgba(255,255,255,0.1); }
+
+    .tab-new {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-left: 4px;
+      margin-bottom: 0;
+      transition: all var(--transition);
+      align-self: center;
+    }
+    .tab-new:hover { background: var(--surface-hover); color: var(--text-primary); }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       3. URL / NAV BAR
+    ════════════════════════════════════════════════════════════════════════ */
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-top: 0.5px solid var(--border);
+      border-bottom: 0.5px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .nav-btn {
+      width: 26px; height: 26px;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .nav-btn:hover { background: var(--surface-hover); color: var(--text-primary); }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+    .url-bar-wrap {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .url-input {
+      width: 100%;
+      height: 30px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 0 70px 0 12px;
+      font-size: 12px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .url-input::placeholder { color: var(--text-muted); }
+    .url-input:focus {
+      border-color: var(--border-focus);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .url-right {
+      position: absolute;
+      right: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .url-icon-btn {
+      width: 20px; height: 20px;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .url-icon-btn:hover { background: var(--surface-hover); color: var(--text-primary); }
+
+    .ai-url-btn {
+      padding: 2px 7px;
+      background: var(--indigo-dim);
+      border: 0.5px solid rgba(99,102,241,0.3);
+      border-radius: 10px;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      color: rgba(99,102,241,0.85);
+      letter-spacing: 0.3px;
+      transition: all var(--transition);
+    }
+    .ai-url-btn:hover { background: rgba(99,102,241,0.25); border-color: var(--indigo); color: var(--indigo); }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       4. MAIN CONTENT AREA
+    ════════════════════════════════════════════════════════════════════════ */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+      padding: 32px 20px 24px;
+      gap: 22px;
+    }
+
+    .center-col {
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+    }
+
+    /* Clock */
+    .clock-block { text-align: center; }
+    .clock-time {
+      font-size: 52px;
+      font-weight: 300;
+      letter-spacing: -2px;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .clock-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    /* Search Bar */
+    .search-wrap {
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      height: 44px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 0 80px 0 42px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus {
+      border-color: var(--border-focus);
+      background: rgba(255,255,255,0.05);
+    }
+    .search-ai-pill {
+      position: absolute;
+      right: 10px;
+      padding: 4px 10px;
+      background: var(--indigo-dim);
+      border: 0.5px solid rgba(99,102,241,0.3);
+      border-radius: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      color: rgba(99,102,241,0.85);
+      letter-spacing: 0.4px;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .search-ai-pill:hover { background: rgba(99,102,241,0.25); color: var(--indigo); }
+
+    /* AI Prompt Chips */
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      width: 100%;
+    }
+    .chip {
+      padding: 6px 13px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .chip:hover {
+      background: var(--indigo-dim);
+      border-color: rgba(99,102,241,0.4);
+      color: rgba(99,102,241,0.9);
+    }
+
+    /* Site Shortcuts */
+    .shortcuts {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .shortcut {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+    .shortcut-icon {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      transition: all var(--transition);
+    }
+    .shortcut:hover .shortcut-icon {
+      background: var(--surface-hover);
+      transform: scale(1.04);
+    }
+    .shortcut-label {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Two-column cards */
+    .cards-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .card {
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border);
+      background: var(--surface);
+      transition: border-color var(--transition), background var(--transition);
+      cursor: pointer;
+    }
+    .card:hover { border-color: rgba(255,255,255,0.15); background: var(--surface-hover); }
+
+    .card-ai {
+      background: rgba(99,102,241,0.07);
+      border-color: rgba(99,102,241,0.2);
+    }
+    .card-ai:hover { border-color: rgba(99,102,241,0.5); background: rgba(99,102,241,0.12); }
+
+    .card-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .card-ai .card-label { color: rgba(99,102,241,0.7); }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .card-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .recent-list { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+    .recent-item { display: flex; align-items: center; gap: 8px; }
+    .recent-dot  {
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .recent-domain {
+      font-size: 11px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      width: 100%;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .stat-col {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      border-right: 0.5px solid var(--border);
+    }
+    .stat-col:last-child { border-right: none; }
+    .stat-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .stat-val.green { color: var(--green); }
+    .stat-lbl {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    /* ── Scrollbar ─────────────────────────────────────────────────────────── */
+    .content::-webkit-scrollbar { width: 4px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .center-col { max-width: 100%; }
+      .cards-row  { grid-template-columns: 1fr; }
+      .stats-bar  { grid-template-columns: repeat(2, 1fr); }
+      .stat-col:nth-child(2) { border-right: none; }
+      .stat-col:nth-child(3) { border-top: 0.5px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow"></div>
+
+  <div class="page">
+
+    <!-- 1. TOP CHROME BAR -->
+    <div class="chrome-bar">
+      <div class="chrome-left">
+        <div class="logo">
+          <div class="logo-mark">V</div>
+          <span class="logo-word">Vikiio</span>
+        </div>
+        <span class="mode-badge">Normal</span>
+      </div>
+      <div class="chrome-right">
+        <span class="stat-chip trackers" id="trackers-chip">0 trackers blocked</span>
+        <span class="stat-chip" id="bookmarks-chip">3 bookmarks</span>
+      </div>
+    </div>
+
+    <!-- 2. TAB BAR -->
+    <div class="tab-bar">
+      <button class="tab active">
+        <span class="tab-star">✦</span>
+        New Tab
+        <span class="tab-close">✕</span>
+      </button>
+      <button class="tab">
+        <span class="tab-dot"></span>
+        YouTube
+        <span class="tab-close">✕</span>
+      </button>
+      <button class="tab-new">+</button>
+    </div>
+
+    <!-- 3. URL / NAV BAR -->
+    <div class="nav-bar">
+      <button class="nav-btn" disabled title="Back">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M8 2L4 6.5L8 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="nav-btn" disabled title="Forward">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M5 2L9 6.5L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="nav-btn" title="Reload">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M2 6.5A4.5 4.5 0 1 0 6.5 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M2 2v4.5H6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="nav-btn" title="Home">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M1.5 6.5L6.5 2l5 4.5V11.5H8.5V8.5H4.5v3H1.5V6.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="url-bar-wrap">
+        <input class="url-input" type="text" placeholder="Search or enter URL" id="url-input" />
+        <div class="url-right">
+          <button class="url-icon-btn" title="Bookmark">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 1.5h8v9.5L6 8.5 2 11V1.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="ai-url-btn">AI</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. MAIN CONTENT -->
+    <div class="content">
+      <div class="center-col">
+
+        <!-- Clock -->
+        <div class="clock-block">
+          <div class="clock-time" id="clock-time">12:00 AM</div>
+          <div class="clock-date" id="clock-date">MONDAY · JANUARY 1</div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-wrap">
+          <span class="search-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 10l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <input class="search-input" type="text" placeholder="Search with Google or enter URL" id="search-input" />
+          <button class="search-ai-pill">✦ AI</button>
+        </div>
+
+        <!-- Quick AI Prompt Chips -->
+        <div class="chips-row">
+          <button class="chip">Summarize saved articles</button>
+          <button class="chip">Open work tabs</button>
+          <button class="chip">Find flights to Miami</button>
+          <button class="chip">Continue yesterday's research</button>
+        </div>
+
+        <!-- Site Shortcuts -->
+        <div class="shortcuts">
+          <div class="shortcut" onclick="window.open('https://google.com','_blank')">
+            <div class="shortcut-icon">🔍</div>
+            <span class="shortcut-label">Google</span>
+          </div>
+          <div class="shortcut" onclick="window.open('https://github.com','_blank')">
+            <div class="shortcut-icon">🐙</div>
+            <span class="shortcut-label">GitHub</span>
+          </div>
+          <div class="shortcut" onclick="window.open('https://youtube.com','_blank')">
+            <div class="shortcut-icon">▶️</div>
+            <span class="shortcut-label">YouTube</span>
+          </div>
+          <div class="shortcut" onclick="window.open('https://reddit.com','_blank')">
+            <div class="shortcut-icon">🤖</div>
+            <span class="shortcut-label">Reddit</span>
+          </div>
+          <div class="shortcut" onclick="window.open('https://twitter.com','_blank')">
+            <div class="shortcut-icon">🐦</div>
+            <span class="shortcut-label">Twitter</span>
+          </div>
+          <div class="shortcut" onclick="window.open('https://wikipedia.org','_blank')">
+            <div class="shortcut-icon">📚</div>
+            <span class="shortcut-label">Wikipedia</span>
+          </div>
+          <div class="shortcut" onclick="window.open('https://maps.google.com','_blank')">
+            <div class="shortcut-icon">🗺️</div>
+            <span class="shortcut-label">Maps</span>
+          </div>
+        </div>
+
+        <!-- Two-Column Cards -->
+        <div class="cards-row">
+          <!-- Ask AI card -->
+          <div class="card card-ai">
+            <div class="card-label">Ask AI</div>
+            <div class="card-title">Your AI assistant</div>
+            <div class="card-desc">Summarize tabs, research topics, draft messages, and more — all in context.</div>
+          </div>
+
+          <!-- Recent card -->
+          <div class="card">
+            <div class="card-label">Recent</div>
+            <div class="recent-list">
+              <div class="recent-item">
+                <div class="recent-dot" style="background:#6366f1;"></div>
+                <span class="recent-domain">github.com</span>
+              </div>
+              <div class="recent-item">
+                <div class="recent-dot" style="background:#ef4444;"></div>
+                <span class="recent-domain">youtube.com</span>
+              </div>
+              <div class="recent-item">
+                <div class="recent-dot" style="background:#4ade80;"></div>
+                <span class="recent-domain">wikipedia.org</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat-col">
+            <span class="stat-val green" id="stat-trackers">0</span>
+            <span class="stat-lbl">Trackers Blocked</span>
+          </div>
+          <div class="stat-col">
+            <span class="stat-val" id="stat-pages">0</span>
+            <span class="stat-lbl">Pages Visited</span>
+          </div>
+          <div class="stat-col">
+            <span class="stat-val" id="stat-bookmarks">3</span>
+            <span class="stat-lbl">Bookmarks</span>
+          </div>
+          <div class="stat-col">
+            <span class="stat-val" id="stat-notes">0</span>
+            <span class="stat-lbl">Saved Notes</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Live clock ──────────────────────────────────────────────────────────
+    function updateClock() {
+      const now = new Date()
+      const timeEl = document.getElementById('clock-time')
+      const dateEl = document.getElementById('clock-date')
+
+      let h = now.getHours()
+      const m = String(now.getMinutes()).padStart(2, '0')
+      const ampm = h >= 12 ? 'PM' : 'AM'
+      h = h % 12 || 12
+      timeEl.textContent = `${h}:${m} ${ampm}`
+
+      const days   = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']
+      const months = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER']
+      dateEl.textContent = `${days[now.getDay()]} · ${months[now.getMonth()]} ${now.getDate()}`
+    }
+    updateClock()
+    setInterval(updateClock, 1000)
+
+    // ── Search ──────────────────────────────────────────────────────────────
+    function doSearch(q) {
+      if (!q.trim()) return
+      const isUrl = /^https?:\/\//i.test(q) || /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(q)
+      const dest = isUrl ? (q.startsWith('http') ? q : 'https://' + q) : 'https://www.google.com/search?q=' + encodeURIComponent(q)
+      window.location.href = dest
+    }
+
+    document.getElementById('search-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch(e.target.value)
+    })
+    document.getElementById('url-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch(e.target.value)
+    })
+
+    // ── Chip clicks ─────────────────────────────────────────────────────────
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const q = chip.textContent.trim()
+        document.getElementById('search-input').value = q
+        document.getElementById('search-input').focus()
+      })
+    })
+  </script>
+</body>
+</html>
