@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from 'react'
 import { useBrowser } from '../store/browserStore'
 import type { AIMessage } from '../types'
 import styles from './AISidebar.module.css'
+import { ExtensionManager } from './ExtensionManager'
+import { OllamaPanel } from './OllamaPanel'
+import { PasswordVault } from './PasswordVault'
 
 const PANEL_TABS = [
   { id: 'chat', label: 'Chat', icon: '💬' },
@@ -13,6 +16,9 @@ const PANEL_TABS = [
   { id: 'bookmarks', label: 'Bookmarks', icon: '🔖' },
   { id: 'downloads', label: 'Downloads', icon: '⬇️' },
   { id: 'settings', label: 'Settings', icon: '⚙️' },
+  { id: 'extensions', label: 'Extensions', icon: '🧩' },
+  { id: 'localai', label: 'Local AI', icon: '🤖' },
+  { id: 'vault', label: 'Vault', icon: '🔑' },
 ] as const
 
 export function AISidebar() {
@@ -64,6 +70,9 @@ export function AISidebar() {
         {sidebarTab === 'bookmarks' && <BookmarksPanel />}
         {sidebarTab === 'downloads' && <DownloadsPanel />}
         {sidebarTab === 'settings' && <SettingsPanel />}
+        {sidebarTab === 'extensions' && <ExtensionManager />}
+        {sidebarTab === 'localai' && <OllamaPanel />}
+        {sidebarTab === 'vault' && <PasswordVault />}
       </div>
     </div>
   )
