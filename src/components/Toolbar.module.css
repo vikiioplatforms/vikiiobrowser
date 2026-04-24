@@ -1,0 +1,269 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  height: var(--toolbar-height);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.navButtons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.navBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background var(--transition), color var(--transition);
+}
+
+.navBtn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-primary); }
+.navBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* Shield */
+.shieldBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex-shrink: 0;
+  position: relative;
+  transition: background var(--transition);
+}
+
+.shieldBtn:hover { background: var(--bg-hover); }
+
+.shield-green { color: var(--shield-green); }
+.shield-yellow { color: var(--shield-yellow); }
+.shield-red { color: var(--shield-red); }
+
+.blockedCount {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--accent);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 3px;
+  border-radius: 8px;
+  min-width: 14px;
+  text-align: center;
+  line-height: 14px;
+}
+
+/* Address Bar */
+.addressBarWrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 10px;
+  height: 36px;
+  gap: 6px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.addressBarWrapper.focused {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.lockIcon { color: var(--success); display: flex; align-items: center; }
+
+.addressBar {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  min-width: 0;
+}
+
+.addressBar::placeholder { color: var(--text-muted); }
+
+.clearBtn {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  transition: background var(--transition), color var(--transition);
+}
+
+.clearBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* Right Actions */
+.rightActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.actionBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background var(--transition), color var(--transition);
+}
+
+.actionBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* Mode switcher */
+.modeWrapper { position: relative; }
+
+.modeBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: background var(--transition), color var(--transition);
+}
+
+.modeBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.menuOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+}
+
+.modeMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 999;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  box-shadow: var(--shadow-lg);
+  min-width: 160px;
+}
+
+.modeOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition), color var(--transition);
+}
+
+.modeOption:hover { background: var(--bg-hover); color: var(--text-primary); }
+.modeOption.modeActive { color: var(--accent); }
+.modeOptionIcon { font-size: 14px; }
+
+/* AI Button */
+.aiBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.aiBtn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+.aiBtn.aiActive { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+.aiBtnLabel { letter-spacing: 0.5px; }
+
+/* Shield Menu */
+.shieldMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 120px;
+  z-index: 999;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: var(--shadow-lg);
+  width: 260px;
+}
+
+.shieldHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.shieldTitle { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.shieldSubtitle { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.shieldToggles { display: flex; flex-direction: column; gap: 8px; }
+
+.shieldToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Toggle switch */
+.toggle {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--bg-active);
+  position: relative;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+
+.toggle.toggleOn { background: var(--accent); }
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  transition: transform var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle.toggleOn .toggleThumb { transform: translateX(16px); }

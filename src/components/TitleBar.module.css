@@ -1,0 +1,82 @@
+.titleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 0 12px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  -webkit-app-region: drag;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.dragArea {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logoIcon {
+  font-size: 16px;
+}
+
+.logoText {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #6c63ff, #4fc3f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.modeIndicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--mode-c, var(--accent));
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--mode-c, var(--accent));
+}
+
+.modeIcon { font-size: 11px; }
+.modeLabel { font-weight: 500; }
+
+.windowControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+}
+
+.winBtn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s;
+}
+
+.winBtn:hover { opacity: 0.8; }
+
+.minimize { background: #f5a623; }
+.maximize { background: #4caf7d; }
+.close { background: #e05252; }
+
+.winBtn span {
+  display: none;
+}

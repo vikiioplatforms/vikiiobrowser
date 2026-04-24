@@ -1,0 +1,156 @@
+.panel {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+
+.addBtn {
+  padding: 5px 12px;
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  transition: background var(--transition);
+}
+
+.addBtn:hover { background: var(--accent-hover); }
+
+.desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.newForm {
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nameInput {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+}
+
+.nameInput:focus { border-color: var(--accent); }
+
+.iconRow { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.iconBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 1.5px solid transparent;
+  transition: border-color var(--transition);
+}
+
+.iconBtn:hover { border-color: var(--border-light); }
+.iconBtn.iconActive { border-color: var(--accent); background: var(--accent-light); }
+
+.colorRow { display: flex; gap: 6px; }
+
+.colorBtn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: transform var(--transition), border-color var(--transition);
+}
+
+.colorBtn:hover { transform: scale(1.15); }
+.colorBtn.colorActive { border-color: white; transform: scale(1.15); }
+
+.formActions { display: flex; gap: 8px; justify-content: flex-end; }
+
+.cancelBtn {
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+}
+
+.cancelBtn:hover { background: var(--bg-hover); }
+
+.saveBtn {
+  padding: 6px 14px;
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  transition: background var(--transition);
+}
+
+.saveBtn:hover { background: var(--accent-hover); }
+
+.workspaceList { display: flex; flex-direction: column; gap: 8px; }
+
+.wsCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--ws-color, var(--accent));
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.wsCard:hover { background: var(--bg-hover); }
+.wsCard.wsActive { background: var(--accent-light); border-color: var(--accent); }
+
+.wsLeft { display: flex; align-items: center; gap: 10px; }
+
+.wsIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.wsName { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.wsTabCount { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.wsRight { display: flex; align-items: center; }
+
+.activeBadge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 2px 8px;
+  border-radius: 20px;
+}

@@ -1,0 +1,22 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.contentArea {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Mode-specific accent colors */
+.mode-normal { --mode-color: var(--accent); --mode-bg: var(--accent-light); }
+.mode-private { --mode-color: #9c27b0; --mode-bg: rgba(156, 39, 176, 0.15); }
+.mode-work { --mode-color: #4fc3f7; --mode-bg: rgba(79, 195, 247, 0.15); }
+.mode-anonymous { --mode-color: #607d8b; --mode-bg: rgba(96, 125, 139, 0.15); }
+.mode-locked { --mode-color: #e05252; --mode-bg: rgba(224, 82, 82, 0.15); }

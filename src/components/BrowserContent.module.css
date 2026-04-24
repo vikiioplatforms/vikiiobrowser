@@ -1,0 +1,17 @@
+.content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.tabContent {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.tabContent.active {
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,170 @@
+.tabBar {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  height: var(--tab-height);
+  overflow: hidden;
+  flex-shrink: 0;
+  padding: 4px 4px 0;
+  gap: 2px;
+}
+
+.tabs {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 2px;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  min-width: 120px;
+  max-width: 220px;
+  flex: 1;
+  background: transparent;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  cursor: pointer;
+  transition: background var(--transition);
+  overflow: hidden;
+}
+
+.tab:hover { background: var(--bg-hover); }
+
+.tab.active {
+  background: var(--bg-primary);
+}
+
+.tab.pinned {
+  min-width: 36px;
+  max-width: 36px;
+  flex: none;
+}
+
+.tabInner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.favicon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+.defaultFavicon {
+  font-size: 12px;
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+}
+
+.tabTitle {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab.active .tabTitle { color: var(--text-primary); font-weight: 500; }
+
+.muteIcon { font-size: 10px; flex-shrink: 0; }
+
+.closeBtn {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity var(--transition), background var(--transition), color var(--transition);
+}
+
+.tab:hover .closeBtn { opacity: 1; }
+.closeBtn:hover { background: var(--bg-active); color: var(--text-primary); }
+
+.activeIndicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--mode-color, var(--accent));
+  border-radius: 2px 2px 0 0;
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.newTabBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  align-self: center;
+  transition: background var(--transition), color var(--transition);
+}
+
+.newTabBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* Context menu */
+.contextOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+}
+
+.contextMenu {
+  position: fixed;
+  z-index: 1000;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  box-shadow: var(--shadow-lg);
+  min-width: 160px;
+}
+
+.contextItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition), color var(--transition);
+}
+
+.contextItem:hover { background: var(--bg-hover); color: var(--text-primary); }
