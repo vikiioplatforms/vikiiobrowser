@@ -1,0 +1,164 @@
+name: Build Vikiio Browser
+
+on:
+  push:
+    tags:
+      - 'v*'          # triggers on version tags like v1.0.0
+  workflow_dispatch:  # allows manual trigger from GitHub Actions tab
+
+permissions:
+  contents: write     # needed to create GitHub Releases
+
+jobs:
+  # ── macOS build (produces .dmg for Apple Silicon + Intel) ─────────────────
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Vite + Electron
+        run: npm run build:all
+
+      - name: Package macOS .dmg
+        run: npx electron-builder --mac --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false   # skip code signing (no cert needed)
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: VikiioB-macOS
+          path: |
+            release/*.dmg
+            release/*.zip
+          retention-days: 30
+
+  # ── Windows build (produces .exe NSIS installer + portable .exe) ──────────
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Vite + Electron
+        run: npm run build:all
+
+      - name: Package Windows .exe
+        run: npx electron-builder --win --publish never
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: VikiioB-Windows
+          path: |
+            release/*.exe
+          retention-days: 30
+
+  # ── Linux build (produces .AppImage + .deb) ───────────────────────────────
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Linux build deps
+        run: sudo apt-get install -y rpm fakeroot dpkg
+
+      - name: Build Vite + Electron
+        run: npm run build:all
+
+      - name: Package Linux .AppImage
+        run: npx electron-builder --linux --publish never
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: VikiioB-Linux
+          path: |
+            release/*.AppImage
+            release/*.deb
+          retention-days: 30
+
+  # ── Create GitHub Release with all installers attached ────────────────────
+  release:
+    needs: [build-mac, build-win, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: VikiioB-macOS
+          path: release/mac
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: VikiioB-Windows
+          path: release/win
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: VikiioB-Linux
+          path: release/linux
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Vikiio Browser ${{ github.ref_name }}"
+          body: |
+            ## Vikiio Browser ${{ github.ref_name }}
+
+            ### Downloads
+            | Platform | File | Notes |
+            |---|---|---|
+            | macOS (Apple Silicon) | `*-arm64.dmg` | M1/M2/M3/M4 Macs |
+            | macOS (Intel) | `*-x64.dmg` | Intel Macs |
+            | Windows | `*-Setup.exe` | NSIS installer |
+            | Windows | `*-Portable.exe` | No install needed |
+            | Linux | `*.AppImage` | Universal Linux |
+            | Linux | `*.deb` | Debian/Ubuntu |
+
+            ### First-time macOS users
+            Right-click the `.dmg` → Open → drag to Applications.
+            If macOS blocks it: System Settings → Privacy & Security → "Open Anyway".
+
+            ### First-time Windows users
+            Run the `-Setup.exe` installer. If SmartScreen appears, click "More info" → "Run anyway".
+          files: |
+            release/mac/*.dmg
+            release/mac/*.zip
+            release/win/*.exe
+            release/linux/*.AppImage
+            release/linux/*.deb
+          draft: false
+          prerelease: false

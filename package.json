@@ -11,10 +11,11 @@
     "electron": "electron .",
     "start": "concurrently -k \"vite\" \"wait-on tcp:5173 && cross-env NODE_ENV=development electron .\"",
     "preview": "vite preview",
-    "dist": "npm run build:all && electron-builder",
-    "dist:mac": "npm run build:all && electron-builder --mac",
-    "dist:win": "npm run build:all && electron-builder --win",
-    "dist:linux": "npm run build:all && electron-builder --linux"
+    "dist": "npm run build:all && electron-builder --publish never",
+    "dist:mac": "npm run build:all && electron-builder --mac --publish never",
+    "dist:win": "npm run build:all && electron-builder --win --publish never",
+    "dist:linux": "npm run build:all && electron-builder --linux --publish never",
+    "dist:all": "npm run build:all && electron-builder --mac --win --linux --publish never"
   },
   "keywords": ["browser", "ai", "privacy", "chromium", "electron"],
   "author": "Vikiio",
@@ -42,28 +43,83 @@
   "build": {
     "appId": "com.vikiio.browser",
     "productName": "Vikiio Browser",
-    "icon": "assets/icon.png",
+    "copyright": "Copyright © 2025 Vikiio",
+    "asar": true,
+    "compression": "maximum",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "assets"
     },
     "files": [
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "assets/**/*",
+      "!node_modules/**/*",
+      "!src/**/*",
+      "!electron/**/*",
+      "!*.ts",
+      "!*.tsx"
+    ],
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets",
+        "filter": ["**/*"]
+      }
     ],
     "mac": {
+      "appId": "com.vikiio.browser",
       "category": "public.app-category.productivity",
       "icon": "assets/icon_1024.png",
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
       "target": [
-        { "target": "dmg", "arch": ["arm64", "x64"] }
+        { "target": "dmg", "arch": ["arm64", "x64"] },
+        { "target": "zip", "arch": ["arm64", "x64"] }
       ]
     },
+    "dmg": {
+      "title": "Vikiio Browser",
+      "icon": "assets/icon_1024.png",
+      "iconSize": 80,
+      "contents": [
+        { "x": 130, "y": 220, "type": "file" },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ],
+      "window": { "width": 540, "height": 380 }
+    },
     "win": {
-      "icon": "assets/icon_256.png",
-      "target": "nsis"
+      "appId": "com.vikiio.browser",
+      "icon": "assets/icon.ico",
+      "publisherName": "Vikiio",
+      "verifyUpdateCodeSignature": false,
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Vikiio Browser",
+      "license": "LICENSE.txt"
     },
     "linux": {
-      "icon": "assets/icon.png",
-      "target": "AppImage"
+      "icon": "assets/icon_512.png",
+      "category": "Network",
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb", "arch": ["x64"] }
+      ]
     }
   }
 }
