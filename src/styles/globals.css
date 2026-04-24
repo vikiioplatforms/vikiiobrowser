@@ -6,7 +6,9 @@
   padding: 0;
 }
 
-:root {
+/* ─── DARK THEME (default) ─────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
   --bg-primary: #0f1117;
   --bg-secondary: #1a1d27;
   --bg-tertiary: #232636;
@@ -28,18 +30,71 @@
   --shield-green: #4caf7d;
   --shield-yellow: #f5a623;
   --shield-red: #e05252;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  --titlebar-bg: #0a0c12;
+  --tabbar-bg: #12141e;
+  --toolbar-bg: #1a1d27;
+  --sidebar-bg: #12141e;
+  --content-bg: #0f1117;
+  --statusbar-bg: #0a0c12;
+  --input-bg: #1a1d27;
+  --card-bg: #232636;
+  --scrollbar-thumb: #3d4166;
+  --selection-bg: rgba(108, 99, 255, 0.25);
+}
+
+/* ─── LIGHT THEME ───────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-primary: #f5f6fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eef0f8;
+  --bg-hover: #e8eaf6;
+  --bg-active: #dde0f5;
+  --border: #d4d7e8;
+  --border-light: #bec3dc;
+  --text-primary: #1a1d2e;
+  --text-secondary: #4a4f72;
+  --text-muted: #8a8faa;
+  --accent: #5b52e8;
+  --accent-hover: #4a42d6;
+  --accent-light: rgba(91, 82, 232, 0.1);
+  --accent-glow: rgba(91, 82, 232, 0.2);
+  --success: #2e9e5e;
+  --warning: #d4880a;
+  --danger: #c94040;
+  --info: #1a9fd4;
+  --shield-green: #2e9e5e;
+  --shield-yellow: #d4880a;
+  --shield-red: #c94040;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
+  --titlebar-bg: #ffffff;
+  --tabbar-bg: #eef0f8;
+  --toolbar-bg: #ffffff;
+  --sidebar-bg: #ffffff;
+  --content-bg: #f5f6fa;
+  --statusbar-bg: #eef0f8;
+  --input-bg: #f5f6fa;
+  --card-bg: #ffffff;
+  --scrollbar-thumb: #bec3dc;
+  --selection-bg: rgba(91, 82, 232, 0.15);
+}
+
+/* ─── SHARED LAYOUT TOKENS ──────────────────────────────────────────────── */
+:root {
   --tab-height: 38px;
   --toolbar-height: 52px;
   --sidebar-width: 360px;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
   --transition: 0.15s ease;
 }
 
+/* ─── BASE ──────────────────────────────────────────────────────────────── */
 html, body, #root {
   height: 100%;
   width: 100%;
@@ -49,20 +104,22 @@ html, body, #root {
   color: var(--text-primary);
   background: var(--bg-primary);
   -webkit-font-smoothing: antialiased;
+  transition: background var(--transition), color var(--transition);
 }
 
-/* Scrollbar */
+/* ─── SCROLLBAR ─────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* Selection */
-::selection { background: var(--accent-light); color: var(--text-primary); }
+/* ─── SELECTION ─────────────────────────────────────────────────────────── */
+::selection { background: var(--selection-bg); color: var(--text-primary); }
 
-/* Focus */
+/* ─── FOCUS ─────────────────────────────────────────────────────────────── */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+/* ─── RESETS ────────────────────────────────────────────────────────────── */
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 input, textarea { font-family: inherit; }
 a { text-decoration: none; color: inherit; }

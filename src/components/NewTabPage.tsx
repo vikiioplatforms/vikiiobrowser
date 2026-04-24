@@ -128,7 +128,7 @@ export function NewTabPage() {
         {state.settings.mode !== 'locked' && (
           <form onSubmit={handleAiCommand} className={styles.aiBar}>
             <div className={styles.aiBarWrapper}>
-              <span className={styles.aiBarIcon}>⚡</span>
+              <img src="/favicon.png" alt="Vikiio AI" className={styles.aiBarIcon} />
               <input
                 className={styles.aiBarInput}
                 value={aiQuery}
