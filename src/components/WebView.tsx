@@ -15,6 +15,7 @@ const IS_ELECTRON = typeof window !== 'undefined' &&
 export function WebView({ tab, isActive }: WebViewProps) {
   const { dispatch } = useBrowser()
   const webviewRef = useRef<any>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [loadError, setLoadError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -55,14 +56,27 @@ export function WebView({ tab, isActive }: WebViewProps) {
       dispatch({ type: 'UPDATE_TAB', id: tab.id, updates: { isLoading: false, title: 'Error' } })
     }
 
+    const onDomReady = () => {
+      // Force a resize after DOM is ready to ensure webview fills the container
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect()
+        if (wv.style) {
+          wv.style.width = `${width}px`
+          wv.style.height = `${height}px`
+        }
+      }
+    }
+
     wv.addEventListener('did-start-loading', onLoadStart)
     wv.addEventListener('did-stop-loading', onLoadStop)
     wv.addEventListener('did-fail-load', onFail)
+    wv.addEventListener('dom-ready', onDomReady)
 
     return () => {
       wv.removeEventListener('did-start-loading', onLoadStart)
       wv.removeEventListener('did-stop-loading', onLoadStop)
       wv.removeEventListener('did-fail-load', onFail)
+      wv.removeEventListener('dom-ready', onDomReady)
     }
   }, [tab.id, tab.url])
 
@@ -77,13 +91,28 @@ export function WebView({ tab, isActive }: WebViewProps) {
     }
   }, [tab.url])
 
-  // ── Web preview (npm run dev) path ───────────────────────────────────────
-  // In a regular browser, iframes are blocked by X-Frame-Options on most sites.
-  // Instead we show a "preview card" with a direct link + screenshot service.
-  const [previewLoaded, setPreviewLoaded] = useState(false)
+  // ── ResizeObserver: keep webview in sync with container size ─────────────
+  useEffect(() => {
+    if (!IS_ELECTRON) return
+    const container = containerRef.current
+    const wv = webviewRef.current
+    if (!container || !wv) return
 
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect
+        if (wv.style) {
+          wv.style.width = `${width}px`
+          wv.style.height = `${height}px`
+        }
+      }
+    })
+    ro.observe(container)
+    return () => ro.disconnect()
+  }, [])
+
+  // ── Web preview (npm run dev) path ───────────────────────────────────────
   const handleIframeLoad = () => {
-    setPreviewLoaded(true)
     setLoadError(false)
     const hostname = (() => { try { return new URL(tab.url).hostname } catch { return tab.url } })()
     dispatch({
@@ -110,10 +139,9 @@ export function WebView({ tab, isActive }: WebViewProps) {
   // ── Error / blocked page ─────────────────────────────────────────────────
   if (loadError) {
     const hostname = (() => { try { return new URL(tab.url).hostname } catch { return tab.url } })()
-    const screenshotUrl = `https://api.screenshotone.com/take?url=${encodeURIComponent(tab.url)}&viewport_width=1280&viewport_height=800&format=jpg&quality=80`
 
     return (
-      <div className={styles.blockedPage}>
+      <div className={styles.blockedPage} style={{ display: isActive ? 'flex' : 'none' }}>
         {/* Site info header */}
         <div className={styles.blockedHeader}>
           <img
@@ -129,14 +157,12 @@ export function WebView({ tab, isActive }: WebViewProps) {
         </div>
 
         {IS_ELECTRON ? (
-          /* Electron: real load failure */
           <div className={styles.errorBox}>
             <div className={styles.errorIcon}>⚠️</div>
             <div className={styles.errorTitle}>Page failed to load</div>
             <div className={styles.errorDesc}>{errorMsg || 'Check your internet connection and try again.'}</div>
           </div>
         ) : (
-          /* Web preview: X-Frame-Options blocked */
           <div className={styles.previewBox}>
             <div className={styles.previewNote}>
               <span className={styles.previewNoteIcon}>ℹ️</span>
@@ -145,8 +171,6 @@ export function WebView({ tab, isActive }: WebViewProps) {
                 This is normal. In the <strong>Electron app</strong> (<code>npm run start</code>), all websites load natively.
               </div>
             </div>
-
-            {/* Action buttons */}
             <div className={styles.blockedActions}>
               <button
                 className={styles.primaryAction}
@@ -155,8 +179,6 @@ export function WebView({ tab, isActive }: WebViewProps) {
                 🌐 Open {hostname} in your browser
               </button>
             </div>
-
-            {/* Quick-access sites that DO allow embedding */}
             <div className={styles.workingSites}>
               <div className={styles.workingSitesTitle}>Sites that work in web preview:</div>
               <div className={styles.workingSitesList}>
@@ -199,6 +221,7 @@ export function WebView({ tab, isActive }: WebViewProps) {
   // ── Render ───────────────────────────────────────────────────────────────
   return (
     <div
+      ref={containerRef}
       className={styles.webviewContainer}
       style={{ display: isActive ? 'flex' : 'none' }}
     >
@@ -210,13 +233,22 @@ export function WebView({ tab, isActive }: WebViewProps) {
 
       {IS_ELECTRON ? (
         // Electron: native webview — loads ALL websites, no iframe restrictions
+        // style prop forces the webview to fill the container immediately on mount
         <webview
           ref={webviewRef}
           src={tab.url}
           className={styles.webview}
-          allowpopups="true"
           // @ts-ignore — webview is an Electron-specific element
-          webpreferences="contextIsolation=yes, javascript=yes"
+          allowpopups="true"
+          webpreferences="contextIsolation=yes, javascript=yes, allowRunningInsecureContent=no"
+          style={{
+            width: '100%',
+            height: '100%',
+            flex: 1,
+            display: 'flex',
+            border: 'none',
+            outline: 'none',
+          }}
         />
       ) : (
         // Web preview: try iframe, show blocked page if it fails

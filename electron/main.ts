@@ -12,13 +12,23 @@ function createWindow() {
     frame: false,
     titleBarStyle: 'hidden',
     backgroundColor: '#0f1117',
+    // Ensure the window is shown after it's ready to avoid black flash
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
       webviewTag: true,
       sandbox: false,
+      // Allow webviews to load all content
+      webSecurity: true,
+      allowRunningInsecureContent: false,
     },
+  })
+
+  // Show window only when ready to prevent black flash
+  win.once('ready-to-show', () => {
+    win.show()
   })
 
   if (isDev) {
