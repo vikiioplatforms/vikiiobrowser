@@ -43,6 +43,14 @@ export function useKeyboardShortcuts() {
         dispatch({ type: 'TOGGLE_SIDEBAR' })
       }
 
+      // Ctrl+, — Open Settings
+      if (ctrl && e.key === ',') {
+        e.preventDefault()
+        if (state.activeTabId) {
+          dispatch({ type: 'UPDATE_TAB', id: state.activeTabId, updates: { url: 'vikiio://settings', title: '⚙️ Settings', isLoading: false } })
+        }
+      }
+
       // Ctrl+1-9 — Switch to tab
       if (ctrl && e.key >= '1' && e.key <= '9') {
         const idx = parseInt(e.key) - 1
