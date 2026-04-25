@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useBrowser } from '../store/browserStore'
 import styles from './NewTabPage.module.css'
+import VikiioPayCard from './VikiioPayCard'
 
 const QUICK_LINKS = [
   { label: 'Google',    url: 'https://google.com',       icon: '🔍' },
@@ -202,6 +203,13 @@ export function NewTabPage() {
               )}
             </div>
           </div>
+
+          {/* ── Vikiio Pay Card ── */}
+          <VikiioPayCard
+            onOpenPay={() => {
+              dispatch({ type: 'UPDATE_TAB', id: state.activeTabId!, updates: { url: 'https://pay.vikiio.com', isLoading: true, title: 'Vikiio Pay' } })
+            }}
+          />
 
           {/* ── Stats Bar ── */}
           <div className={styles.statsBar}>

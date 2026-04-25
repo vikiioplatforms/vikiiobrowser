@@ -1,0 +1,281 @@
+/* ── Card shell ───────────────────────────────────────────────────────── */
+.card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 0.5px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 14px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 150ms ease;
+}
+
+/* Subtle green glow in top-right corner */
+.card::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(74, 222, 128, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* ── Header ───────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerLeft { display: flex; align-items: center; gap: 8px; }
+.headerRight { display: flex; align-items: center; gap: 6px; }
+
+.payBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 7px;
+  background: rgba(74, 222, 128, 0.08);
+  border: 0.5px solid rgba(74, 222, 128, 0.2);
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(74, 222, 128, 0.85);
+  letter-spacing: 0.2px;
+}
+
+.iconBtn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.iconBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.openBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(74, 222, 128, 0.1);
+  border: 0.5px solid rgba(74, 222, 128, 0.25);
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(74, 222, 128, 0.85);
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.openBtn:hover {
+  background: rgba(74, 222, 128, 0.18);
+  border-color: rgba(74, 222, 128, 0.5);
+  color: #4ade80;
+}
+
+/* ── Balance ──────────────────────────────────────────────────────────── */
+.balanceRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.balanceLabel {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
+}
+
+.balance {
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1;
+  transition: filter 200ms ease;
+}
+
+.blurred {
+  filter: blur(6px);
+  user-select: none;
+}
+
+.balanceMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metaDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.metaText {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Quick Actions ────────────────────────────────────────────────────── */
+.actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.actionBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 0.5px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.actionBtn:hover {
+  background: rgba(74, 222, 128, 0.08);
+  border-color: rgba(74, 222, 128, 0.2);
+}
+
+.actionIcon {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1;
+}
+
+.actionLabel {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.2px;
+}
+
+/* ── Divider ──────────────────────────────────────────────────────────── */
+.divider {
+  height: 0.5px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 0 -2px;
+}
+
+/* ── Transactions ─────────────────────────────────────────────────────── */
+.txnHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.txnTitle {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.txnToggle {
+  font-size: 10px;
+  color: rgba(74, 222, 128, 0.6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 150ms ease;
+}
+.txnToggle:hover { color: #4ade80; }
+
+.txnList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.txn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: filter 200ms ease;
+}
+
+.txnIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.txnInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.txnLabel {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.txnTime {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.txnAmount {
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.credit { color: #4ade80; }
+.debit  { color: rgba(255, 255, 255, 0.65); }
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.2px;
+  padding-top: 2px;
+}
